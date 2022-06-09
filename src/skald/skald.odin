@@ -52,6 +52,7 @@ TextboxCoreData :: struct {
 }
 
 // Textbox structure
+// TODO: color
 @(private)
 Textbox :: struct {
 	position: Vector2,
@@ -65,14 +66,15 @@ Textbox :: struct {
 	nPatch:   NPatch,
 	font:     Font,
 
-	fontSize: int,
+	fontSize: i32,
 
 	currentText:  string,
 	completeText: [dynamic]string,
 
 	options: [dynamic]MenuOption,
 
-	clickable: bool,
+	clickable:          bool,
+	displayCursor:      bool,
 	dispChar, dispLine: u32,
 }
 
@@ -85,9 +87,11 @@ MenuOption :: struct {
 
 //= Procedures
 // TODO: change the return values to a custom error code
+// TODO: changing core data
 
 //- Initialization / Freeing
 // TODO: check for errors at end and pprovide error codes
+// TODO: Debugging text
 init_skald :: proc(
 		speed: u8        = 5,
 		texture: Texture = {},
@@ -140,20 +144,22 @@ init_check :: proc() -> bool {
 
 //- Textbox creation
 create_textbox :: proc(
-		position: Vector2 = { 0, 0},
-		size:     Vector2 = {10,10},
-		offset:   Vector2 = {16,16},
+		position: Vector2 = {  0,  0},
+		size:     Vector2 = {200,100},
+		offset:   Vector2 = { 16, 16},
 		
 		texture:  Texture = {},
 		cursor:   Texture = {},
 		npatch:   NPatch  = {},
 		font:     Font    = {},
-		fontSize: int     = 20,
+		fontSize: i32     = 20,
 		
 		textDynamic:  [dynamic]string     = nil,
 		textSingle:   string              = "",
 		options:      [dynamic]MenuOption = nil) -> u32 {
 	init_check();
+
+	fmt.printf("Creating a textbox\n");
 
 	textbox: Textbox = {};
 	textbox.position = position;
@@ -199,7 +205,50 @@ create_textbox :: proc(
 		append(&textbox.options,defaultOption);
 	} else do textbox.options = options;
 
+	append(&textboxCoreData.textboxes, textbox);
+
 	return 0;
+}
+
+//- Updating / Drawing
+// Update
+update_textboxes :: proc() {
+	numOfTextboxes := len(textboxCoreData.textboxes);
+	
+	if textboxCoreData.updateTic == (textboxCoreData.textspeed * 100) {
+		for i:=0; i < numOfTextboxes; i +=1 {
+			textbox: Textbox    = textboxCoreData.textboxes[i];
+			
+
+			textbox.displayCursor = !textbox.displayCursor;
+		}
+
+		textboxCoreData.updateTic = 0;
+	} else do textboxCoreData.updateTic += 1;
+}
+// Draw
+draw_textboxes :: proc() {
+	numOfTextboxes := len(textboxCoreData.textboxes);
+	
+	for i:=0; i < numOfTextboxes; i +=1 {
+		textbox: Textbox    = textboxCoreData.textboxes[i];
+		bodyRect: Rectangle = {textbox.position.x, textbox.position.y, textbox.size.x, textbox.size.y};
+
+		text: cstring = str.clone_to_cstring(textbox.currentText);
+		textX: i32    = i32(bodyRect.x + textbox.offset.x);
+		textY: i32    = i32(bodyRect.y + textbox.offset.y);
+
+		ray.draw_texture_n_patch(textbox.texture, textbox.nPatch, bodyRect, Vector2{0,0}, 0, ray.WHITE);
+		ray.draw_text(text, textX, textY, textbox.fontSize, ray.BLACK);
+
+		//DrawTexture(Texture2D texture, int posX, int posY, Color tint);
+		if len(textbox.options) == 1 && textbox.displayCursor {
+			cursorX: i32 = i32((textbox.position.x + textbox.size.x) - textbox.offset.x);
+			cursorY: i32 = i32((textbox.position.y + textbox.size.y) - textbox.offset.y);
+
+			ray.draw_texture(textbox.cursor, cursorX, cursorY, ray.WHITE);
+		}
+	}
 }
 
 //- Default Option
