@@ -57,7 +57,10 @@ main :: proc() {
 	res := skald.init_skald();
 	if res != 0 do return;
 
-	skald.create_textbox(textSingle="Fuck");
+
+	text: [dynamic]string;
+	append(&text, "Fuck me?", "Fuck you, motherfucker!");
+	skald.create_textbox(textDynamic=text);
 
 
 	for !ray.window_should_close() {

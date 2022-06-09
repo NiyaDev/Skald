@@ -10,6 +10,7 @@ package skald
 //= Imports
 import fmt "core:fmt"
 import str "core:strings"
+import io  "core:io"
 import ray "../raylib"
 
 
@@ -93,7 +94,7 @@ MenuOption :: struct {
 // TODO: check for errors at end and pprovide error codes
 // TODO: Debugging text
 init_skald :: proc(
-		speed: u8        = 5,
+		speed: u8        = 2,
 		texture: Texture = {},
 		cursor: Texture  = {},
 		font: Font       = {},) -> u32 {
@@ -212,19 +213,71 @@ create_textbox :: proc(
 
 //- Updating / Drawing
 // Update
+// TODO: detach cursor blinking from update tic
 update_textboxes :: proc() {
 	numOfTextboxes := len(textboxCoreData.textboxes);
 	
-	if textboxCoreData.updateTic == (textboxCoreData.textspeed * 100) {
+	if textboxCoreData.updateTic >= (textboxCoreData.textspeed * 5) {
 		for i:=0; i < numOfTextboxes; i +=1 {
-			textbox: Textbox    = textboxCoreData.textboxes[i];
+			textbox: ^Textbox    = &textboxCoreData.textboxes[i];
 			
+			if textbox.currentText != textbox.completeText[textbox.dispLine] {
+				textbox.dispChar += 1;
 
-			textbox.displayCursor = !textbox.displayCursor;
+				delete(textbox.currentText);
+
+				reader:  str.Reader;
+				str.reader_init(&reader, textbox.completeText[textbox.dispLine]);
+
+				builder: str.Builder;
+				str.init_builder(&builder);
+
+
+				for o:=0; o < int(textbox.dispChar); o+=1 {
+					output, error := str.reader_read_byte(&reader);
+
+					if error != io.Error.None {
+						textbox.clickable = true;
+						break;
+					}
+
+					str.write_byte(&builder, output);
+				}
+
+				textbox.currentText = str.to_string(builder);
+			} else {
+				
+
+				textbox.displayCursor = !textbox.displayCursor;
+			}
 		}
 
 		textboxCoreData.updateTic = 0;
 	} else do textboxCoreData.updateTic += 1;
+
+	if ray.is_key_pressed(ray.Keyboard_Key.KEY_SPACE) {
+		textbox: ^Textbox = &textboxCoreData.textboxes[len(textboxCoreData.textboxes) - 1];
+
+		strLength: u32 = u32(len(textbox.completeText[textbox.dispLine]) - 1);
+		arrLength: u32 = u32(len(textbox.completeText) - 1);
+
+		if textbox.dispChar <= strLength {
+			textbox.dispChar = strLength+1;
+				fmt.printf("skip\n")
+			return;
+		} else {
+			if textbox.dispLine < arrLength {
+				fmt.printf("nextline\n")
+				textbox.dispLine += 1;
+				textbox.dispChar  = 0;
+				return;
+			} else {
+				// TODO: close textbox
+				fmt.printf("close\n")
+				return;
+			}
+		}
+	}
 }
 // Draw
 draw_textboxes :: proc() {
