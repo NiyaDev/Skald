@@ -205,7 +205,7 @@ create_textbox :: proc(
 	if textDynamic == nil {
 		textbox.completeText = make([dynamic]string);
 		if textSingle != "" do append(&textbox.completeText,textSingle);
-		else             do append(&textbox.completeText,"ERROR: NO TEXT INPUT");
+		else                do append(&textbox.completeText,"ERROR: NO TEXT INPUT");
 	} else do textbox.completeText = textDynamic;
 
 	// Options
