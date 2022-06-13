@@ -11,17 +11,22 @@ Skald is a Textbox system for game development that is made to be simple to use.
 ---
 ### General Procedures:
 >__`init_skald() -> ErrorCode`__
+>
 >initializes core structure and sets default variables.
+>
 >__Input:__
 > `speed: u8 = 2` Text speed
 > `texture, cursor: Raylib.Texture = {}` Default textures. If empty it will create small placeholders.
 > `font: Raylib.Font = {}` Default font. If empty, it will grab Raylib's current font.
 
 >__`free_skald() -> ErrorCode`__
+>
 >Frees all allocated data.
 
 >__`create_textbox() -> ErrorCode`__
+>
 >Creates a textbox.
+>
 >__Input:__
 >`position, size, offset: Raylib.Vector2` Transform of the textbox.
 >`texture, cursor: Raylib.Texture = {}` Sets textures. If empty, will use default.
@@ -33,18 +38,24 @@ Skald is a Textbox system for game development that is made to be simple to use.
 >`options: [dynamic]MenuOption = nil` Used for player choice.
 
 >__`update_textboxes() -> ErrorCode`__
+>
 >Updates the logic of the textboxes.
 
 >__`draw_textboxes() -> ErrorCode`__
+>
 >Draws the textboxes to screen.
 
 >__`close_textbox() -> ErrorCode`__
+>
 >Forcibly closes textbox.
+>
 >__Input:__
 >`index: int` The index of the textbox to close.
 
 >__`output_error() -> ErrorCode`__
+>
 >Prints to console the input error code
+>
 >__Input:__
 >`error: ErrorCode` Code to print.
 
