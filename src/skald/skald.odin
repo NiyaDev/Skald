@@ -76,6 +76,7 @@ Textbox :: struct {
 
 	clickable:          bool,
 	displayCursor:      bool,
+	positionCursor:     i32,
 	dispChar, dispLine: u32,
 }
 
@@ -114,7 +115,7 @@ init_skald :: proc(
 
 	// Checking for empty Cursor input
 	if cursor == {} {
-		img: ray.Image = ray.gen_image_color(20, 20, ray.BLACK);
+		img: ray.Image = ray.gen_image_color(16, 16, ray.BLACK);
 		textboxCoreData.defaultCursor = ray.load_texture_from_image(img);
 		ray.unload_image(img);
 		
@@ -264,6 +265,16 @@ update_textboxes :: proc() -> ErrorCode {
 		textboxCoreData.updateTic = 0;
 	} else do textboxCoreData.updateTic += 1;
 
+	if len(textboxCoreData.textboxes) != 0 {
+		textbox: ^Textbox = &textboxCoreData.textboxes[len(textboxCoreData.textboxes) - 1];
+
+		if ray.is_key_pressed(ray.Keyboard_Key.KEY_W) do textbox.positionCursor-=1;
+		if ray.is_key_pressed(ray.Keyboard_Key.KEY_S) do textbox.positionCursor+=1;
+
+		if textbox.positionCursor < 0 do textbox.positionCursor = 0;
+		if textbox.positionCursor > i32(len(textbox.options) - 1) do textbox.positionCursor = i32(len(textbox.options) - 1);
+	}
+
 	if ray.is_key_pressed(ray.Keyboard_Key.KEY_SPACE) && numOfTextboxes > 0 {
 		textbox: ^Textbox = &textboxCoreData.textboxes[len(textboxCoreData.textboxes) - 1];
 
@@ -272,14 +283,17 @@ update_textboxes :: proc() -> ErrorCode {
 
 		if textbox.dispChar <= strLength {
 			textbox.dispChar = strLength+1;
+			textbox.clickable = true;
 			return .none;
 		} else {
 			if textbox.dispLine < arrLength {
 				textbox.dispLine += 1;
 				textbox.dispChar  = 0;
+				textbox.clickable = false;
 				return .none;
 			} else {
-				res := close_textbox(0);
+				textbox.options[textbox.positionCursor].effect();
+				res := close_textbox(len(textboxCoreData.textboxes) - 1);
 				if output_error(res) do return res;
 				return .none;
 			}
@@ -322,8 +336,15 @@ draw_textboxes :: proc() -> ErrorCode {
 				
 				for o:=0; o < len(textbox.options); o+=1 {
 					text: cstring = str.clone_to_cstring(textbox.options[o].text);
-					ray.draw_text(text, i32(rect.x + 16), i32(rect.y + 16) + i32(o * 20), textbox.fontSize, ray.BLACK);
+					ray.draw_text(text, i32(rect.x + 40), i32(rect.y + 16) + i32(o) * textbox.fontSize, textbox.fontSize, ray.BLACK);
 					delete(text);
+				}
+
+				if textbox.displayCursor {
+					cursorX: i32 = i32((rect.x + 16));
+					cursorY: i32 = i32(rect.y + 16) + i32(textbox.positionCursor) * textbox.fontSize;
+					
+					ray.draw_texture(textbox.cursor, cursorX, cursorY, ray.WHITE);
 				}
 			}
 		}
@@ -348,15 +369,9 @@ close_textbox :: proc(index: int) -> ErrorCode {
 
 	return .none;
 }
-// Forward textbox
-// TODO: this
-forward_textbox :: proc(index: int) -> ErrorCode {
-	return .none;
-}
 
 
 //- Default Option
 default_option :: proc() {
-	res := forward_textbox(0);
-	output_error(res);
+	fmt.printf("DEFAULT PROCEDURE\n");
 }
