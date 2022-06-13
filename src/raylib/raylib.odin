@@ -12,7 +12,7 @@ Load_File_Data_Callback :: proc(filename: cstring, bytes_read: ^u8) -> ^u8;
 Save_File_Data_Callback :: proc(filename: cstring, data: rawptr, bytes_to_write: u8) -> bool;
 Load_File_Text_Callback :: proc(filename: cstring) -> ^u8;
 Save_File_Text_Callback :: proc(filename: cstring, text: ^u8) -> bool;
-LIGHTGRAY :: Color {200, 200, 200, 255};
+LIGHTGRAY :: Color{ 200, 200, 200, 255 };
 GRAY      :: Color{ 130, 130, 130, 255 };
 DARKGRAY  :: Color{ 80, 80, 80, 255 };
 YELLOW    :: Color{ 253, 249, 0, 255 };

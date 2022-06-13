@@ -1,7 +1,7 @@
 package skald
 //=-------------------=//
 // Written: 2022/06/07 //
-// Edited:  2022/06/07 //
+// Edited:  2022/06/13 //
 // Version:   0.01.0   //
 //=-------------------=//
 
@@ -91,13 +91,14 @@ MenuOption :: struct {
 // TODO: changing core data
 
 //- Initialization / Freeing
-// TODO: check for errors at end and pprovide error codes
-// TODO: Debugging text
 init_skald :: proc(
 		speed: u8        = 2,
 		texture: Texture = {},
 		cursor: Texture  = {},
-		font: Font       = {},) -> u32 {
+		font: Font       = {}) -> ErrorCode {
+	
+	if textboxCoreData != nil do return .already_init_skald;
+
 	textboxCoreData = new(TextboxCoreData);
 	textboxCoreData.textspeed = speed;
 	textboxCoreData.updateTic = 0;
@@ -107,6 +108,8 @@ init_skald :: proc(
 		img: ray.Image = ray.gen_image_gradient_v(48, 48, ray.BLACK, ray.WHITE);
 		textboxCoreData.defaultTexture = ray.load_texture_from_image(img);
 		ray.unload_image(img);
+		
+		if textboxCoreData.defaultTexture == {} do return .def_texture_missing;
 	} else do textboxCoreData.defaultTexture = texture;
 
 	// Checking for empty Cursor input
@@ -114,17 +117,22 @@ init_skald :: proc(
 		img: ray.Image = ray.gen_image_color(20, 20, ray.BLACK);
 		textboxCoreData.defaultCursor = ray.load_texture_from_image(img);
 		ray.unload_image(img);
+		
+		if textboxCoreData.defaultCursor == {} do return .def_cursor_missing;
 	} else do textboxCoreData.defaultCursor = cursor;
 
 	// Checking for empty Font input
-	if font == {} do textboxCoreData.defaultFont = ray.get_font_default();
-	else          do textboxCoreData.defaultFont = font;
+	if font == {} {
+		textboxCoreData.defaultFont = ray.get_font_default();
+		
+		if textboxCoreData.defaultFont == {} do return .def_font_missing;
+	} else do textboxCoreData.defaultFont = font;
 
 	textboxCoreData.textboxes = make([dynamic]Textbox);
 
-	return 0;
+	return .none;
 }
-free_skald :: proc() -> u32 {
+free_skald :: proc() -> ErrorCode {
 	ray.unload_texture(textboxCoreData.defaultTexture);
 	ray.unload_texture(textboxCoreData.defaultCursor);
 	ray.unload_font(textboxCoreData.defaultFont);
@@ -132,15 +140,17 @@ free_skald :: proc() -> u32 {
 	delete(textboxCoreData.textboxes);
 	free(textboxCoreData);
 
-	return 0;
+	return .none;
 }
 @(private)
-init_check :: proc() -> bool {
-	if textboxCoreData.defaultTexture == {} do return false;
-	if textboxCoreData.defaultCursor  == {} do return false;
-	if textboxCoreData.defaultFont    == {} do return false;
+init_check :: proc() -> ErrorCode {
+	if textboxCoreData == nil do return .init_failed_check;
 
-	return true;
+	if textboxCoreData.defaultTexture == {} do return .def_texture_missing;
+	if textboxCoreData.defaultCursor  == {} do return .def_cursor_missing;
+	if textboxCoreData.defaultFont    == {} do return .def_font_missing;
+
+	return .none;
 }
 
 //- Textbox creation
@@ -255,7 +265,7 @@ update_textboxes :: proc() {
 		textboxCoreData.updateTic = 0;
 	} else do textboxCoreData.updateTic += 1;
 
-	if ray.is_key_pressed(ray.Keyboard_Key.KEY_SPACE) {
+	if ray.is_key_pressed(ray.Keyboard_Key.KEY_SPACE) && len(textboxCoreData.textboxes) > 0 {
 		textbox: ^Textbox = &textboxCoreData.textboxes[len(textboxCoreData.textboxes) - 1];
 
 		strLength: u32 = u32(len(textbox.completeText[textbox.dispLine]) - 1);
@@ -263,17 +273,14 @@ update_textboxes :: proc() {
 
 		if textbox.dispChar <= strLength {
 			textbox.dispChar = strLength+1;
-				fmt.printf("skip\n")
 			return;
 		} else {
 			if textbox.dispLine < arrLength {
-				fmt.printf("nextline\n")
 				textbox.dispLine += 1;
 				textbox.dispChar  = 0;
 				return;
 			} else {
-				// TODO: close textbox
-				fmt.printf("close\n")
+				close_textbox(0);
 				return;
 			}
 		}
@@ -303,6 +310,19 @@ draw_textboxes :: proc() {
 		}
 	}
 }
+// Close textbox
+close_textbox :: proc(index: int) {
+	listCopy: [dynamic]Textbox = make([dynamic]Textbox);
+
+	for i:=0; i < len(textboxCoreData.textboxes); i+=1 {
+		if i == index do continue;
+		append(&listCopy, textboxCoreData.textboxes[i]);
+	}
+
+	delete(textboxCoreData.textboxes);
+	textboxCoreData.textboxes = listCopy;
+}
+
 
 //- Default Option
 default_option :: proc() {

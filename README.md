@@ -6,6 +6,8 @@
 A textbox system for use in games using Raylib.
 
 ## Resources
+~~[Documentation](docs.md)~~
+
 ~~[TODO](TODO.md)~~
 
 ~~[Changelog](CHANGELOG.md)~~

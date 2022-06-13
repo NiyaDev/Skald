@@ -1,7 +1,7 @@
 package main
 ///=-------------------=///
 //  Written: 2022/05/20  //
-//  Edited:  2022/05/20  //
+//  Edited:  2022/06/13  //
 ///=-------------------=///
 
 
@@ -55,7 +55,7 @@ main :: proc() {
 //	fmt.printf("%i\n", test);
 
 	res := skald.init_skald();
-	if res != 0 do return;
+	if res != .none do return;
 
 
 	text: [dynamic]string;
@@ -84,7 +84,7 @@ main :: proc() {
 	}
 
 	res = skald.free_skald();
-	if res != 0 do return;
+	if res != .none do return;
 
 	ray.close_window();
 }
