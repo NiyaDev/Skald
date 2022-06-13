@@ -55,19 +55,26 @@ main :: proc() {
 //	fmt.printf("%i\n", test);
 
 	res := skald.init_skald();
-	if res != .none do return;
+	if skald.output_error(res) do return;
+
+	img: ray.Image   = ray.load_image("data/skald/textbox.png");
+	tex: ray.Texture = ray.load_texture_from_image(img);
+	ray.unload_image(img);
 
 
 	text: [dynamic]string;
-	append(&text, "Fuck me?", "Fuck you, motherfucker!");
-	skald.create_textbox(textDynamic=text);
+	append(&text, "Fuck me?");
+	menuOptions: [dynamic]skald.MenuOption;
+	append(&menuOptions, skald.MenuOption{text="Yes",effect=skald.default_option},skald.MenuOption{text="No",effect=skald.default_option});
+	res = skald.create_textbox(texture=tex,size=ray.Vector2{600,200},textDynamic=text,options=menuOptions);
+	if skald.output_error(res) do return;
 
 
 	for !ray.window_should_close() {
 		// Updating
 		{
-			skald.update_textboxes();
-			//txt_old.update_textboxes();
+			res = skald.update_textboxes();
+			if skald.output_error(res) do return;
 		}
 
 		// Drawing
@@ -75,8 +82,8 @@ main :: proc() {
 			ray.begin_drawing();
 				ray.clear_background(ray.RAYWHITE);
 					
-	//				txt_old.draw_textboxes();
-					skald.draw_textboxes();
+					res = skald.draw_textboxes();
+					if skald.output_error(res) do return;
 
 					ray.draw_fps((8 * 3), (8 * 5));
 			ray.end_drawing();
@@ -84,7 +91,7 @@ main :: proc() {
 	}
 
 	res = skald.free_skald();
-	if res != .none do return;
+	if skald.output_error(res) do return;
 
 	ray.close_window();
 }

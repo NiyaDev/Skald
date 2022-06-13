@@ -167,10 +167,9 @@ create_textbox :: proc(
 		
 		textDynamic:  [dynamic]string     = nil,
 		textSingle:   string              = "",
-		options:      [dynamic]MenuOption = nil) -> u32 {
-	init_check();
-
-	fmt.printf("Creating a textbox\n");
+		options:      [dynamic]MenuOption = nil) -> ErrorCode {
+	res := init_check();
+	if output_error(res) do return res;
 
 	textbox: Textbox = {};
 	textbox.position = position;
@@ -218,13 +217,13 @@ create_textbox :: proc(
 
 	append(&textboxCoreData.textboxes, textbox);
 
-	return 0;
+	return .none;
 }
 
 //- Updating / Drawing
 // Update
 // TODO: detach cursor blinking from update tic
-update_textboxes :: proc() {
+update_textboxes :: proc() -> ErrorCode {
 	numOfTextboxes := len(textboxCoreData.textboxes);
 	
 	if textboxCoreData.updateTic >= (textboxCoreData.textspeed * 5) {
@@ -265,7 +264,7 @@ update_textboxes :: proc() {
 		textboxCoreData.updateTic = 0;
 	} else do textboxCoreData.updateTic += 1;
 
-	if ray.is_key_pressed(ray.Keyboard_Key.KEY_SPACE) && len(textboxCoreData.textboxes) > 0 {
+	if ray.is_key_pressed(ray.Keyboard_Key.KEY_SPACE) && numOfTextboxes > 0 {
 		textbox: ^Textbox = &textboxCoreData.textboxes[len(textboxCoreData.textboxes) - 1];
 
 		strLength: u32 = u32(len(textbox.completeText[textbox.dispLine]) - 1);
@@ -273,21 +272,24 @@ update_textboxes :: proc() {
 
 		if textbox.dispChar <= strLength {
 			textbox.dispChar = strLength+1;
-			return;
+			return .none;
 		} else {
 			if textbox.dispLine < arrLength {
 				textbox.dispLine += 1;
 				textbox.dispChar  = 0;
-				return;
+				return .none;
 			} else {
-				close_textbox(0);
-				return;
+				res := close_textbox(0);
+				if output_error(res) do return res;
+				return .none;
 			}
 		}
 	}
+
+	return .none;
 }
 // Draw
-draw_textboxes :: proc() {
+draw_textboxes :: proc() -> ErrorCode {
 	numOfTextboxes := len(textboxCoreData.textboxes);
 	
 	for i:=0; i < numOfTextboxes; i +=1 {
@@ -301,17 +303,39 @@ draw_textboxes :: proc() {
 		ray.draw_texture_n_patch(textbox.texture, textbox.nPatch, bodyRect, Vector2{0,0}, 0, ray.WHITE);
 		ray.draw_text(text, textX, textY, textbox.fontSize, ray.BLACK);
 
-		//DrawTexture(Texture2D texture, int posX, int posY, Color tint);
+		delete(text);
+
+		// No options
 		if len(textbox.options) == 1 && textbox.displayCursor {
 			cursorX: i32 = i32((textbox.position.x + textbox.size.x) - textbox.offset.x);
 			cursorY: i32 = i32((textbox.position.y + textbox.size.y) - textbox.offset.y);
 
 			ray.draw_texture(textbox.cursor, cursorX, cursorY, ray.WHITE);
 		}
+		// Options
+		if len(textbox.options) > 1 {
+			if textbox.clickable {
+				rect: Rectangle = {
+					bodyRect.width * 2/3, bodyRect.y,
+					bodyRect.width * 1/3, f32(32 + (len(textbox.options) * 20))};
+				ray.draw_texture_n_patch(textbox.texture, textbox.nPatch, rect, Vector2{0,0}, 0, ray.WHITE);
+				
+				for o:=0; o < len(textbox.options); o+=1 {
+					text: cstring = str.clone_to_cstring(textbox.options[o].text);
+					ray.draw_text(text, i32(rect.x + 16), i32(rect.y + 16) + i32(o * 20), textbox.fontSize, ray.BLACK);
+					delete(text);
+				}
+			}
+		}
 	}
+
+	return .none;
 }
 // Close textbox
-close_textbox :: proc(index: int) {
+close_textbox :: proc(index: int) -> ErrorCode {
+	if len(textboxCoreData.textboxes) == 0    do return .closing_oob;
+	if index > len(textboxCoreData.textboxes) do return .closing_oob;
+
 	listCopy: [dynamic]Textbox = make([dynamic]Textbox);
 
 	for i:=0; i < len(textboxCoreData.textboxes); i+=1 {
@@ -321,10 +345,18 @@ close_textbox :: proc(index: int) {
 
 	delete(textboxCoreData.textboxes);
 	textboxCoreData.textboxes = listCopy;
+
+	return .none;
+}
+// Forward textbox
+// TODO: this
+forward_textbox :: proc(index: int) -> ErrorCode {
+	return .none;
 }
 
 
 //- Default Option
 default_option :: proc() {
-
+	res := forward_textbox(0);
+	output_error(res);
 }
