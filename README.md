@@ -15,6 +15,7 @@ Skald is a Textbox system for game development that is made to be simple to use.
 >initializes core structure and sets default variables.
 >
 >__Input:__
+>
 > `speed: u8 = 2` Text speed.
 >
 > `texture, cursor: Raylib.Texture = {}` Default textures. If empty it will create small placeholders.
@@ -30,6 +31,7 @@ Skald is a Textbox system for game development that is made to be simple to use.
 >Creates a textbox.
 >
 >__Input:__
+>
 >`position, size, offset: Raylib.Vector2` Transform of the textbox.
 >
 >`texture, cursor: Raylib.Texture = {}` Sets textures. If empty, will use default.
@@ -59,6 +61,7 @@ Skald is a Textbox system for game development that is made to be simple to use.
 >Forcibly closes textbox.
 >
 >__Input:__
+>
 >`index: int` The index of the textbox to close.
 
 >__`output_error() -> ErrorCode`__
@@ -66,6 +69,7 @@ Skald is a Textbox system for game development that is made to be simple to use.
 >Prints to console the input error code
 >
 >__Input:__
+>
 >`error: ErrorCode` Code to print.
 
 
