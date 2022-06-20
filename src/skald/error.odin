@@ -1,32 +1,21 @@
 package skald
-//=-------------------=//
-// Written: 2022/06/13 //
-// Edited:  2022/06/13 //
-// Version:   0.01.0   //
-//=-------------------=//
 
 
 
 //= Imports
-import fmt "core:fmt"
-
-//= Global Variables
+import "core:fmt"
 
 //= Constants
 
-//= Enumerations
-ErrorCode :: enum {
-	none,
-	init_failed_check, already_init_skald,
-	internal_error,
-	def_texture_missing, def_cursor_missing, def_font_missing,
-	closing_oob};
+//= Global Variables
 
 //= Structures
 
+//= Enumerations
+
 //= Procedures
 
-//- output error
+// Optional Error logging
 output_error :: proc(error: ErrorCode) -> bool {
 
 	#partial switch error {
@@ -50,4 +39,16 @@ output_error :: proc(error: ErrorCode) -> bool {
 	}
 
 	return int(error) != 0;
+}
+
+// Internal checks
+@(private)
+init_check :: proc() -> ErrorCode {
+	if textboxCoreData == nil do return .init_failed_check;
+
+	if textboxCoreData.defaultTexture == {} do return .def_texture_missing;
+	if textboxCoreData.defaultCursor  == {} do return .def_cursor_missing;
+	if textboxCoreData.defaultFont    == {} do return .def_font_missing;
+
+	return .none;
 }
