@@ -72,7 +72,9 @@ Textbox :: struct {
 	currentText:  string,
 	completeText: [dynamic]string,
 
-	options: [dynamic]MenuOption,
+	options:         [dynamic]MenuOption,
+	optionsPosition: Vector2,
+	optionsSize:     Vector2,
 
 	clickable:          bool,
 	displayCursor:      bool,
@@ -166,9 +168,11 @@ create_textbox :: proc(
 		font:     Font    = {},
 		fontSize: i32     = 20,
 		
-		textDynamic:  [dynamic]string     = nil,
-		textSingle:   string              = "",
-		options:      [dynamic]MenuOption = nil) -> ErrorCode {
+		textDynamic:     [dynamic]string     = nil,
+		textSingle:      string              = "",
+		options:         [dynamic]MenuOption = nil,
+		optionsPosition: Vector2             = {},
+		optionsSize: Vector2             = {}) -> ErrorCode {
 	res := init_check();
 	if output_error(res) do return res;
 
@@ -216,7 +220,17 @@ create_textbox :: proc(
 		append(&textbox.options,defaultOption);
 	} else do textbox.options = options;
 
+	if optionsSize == {} {
+		textbox.optionsSize = Vector2{200, f32(len(textbox.options) * 20) + 64};
+	}
+
+	if optionsPosition == {} {
+		textbox.optionsPosition = Vector2{textbox.size.x - (textbox.size.x / 3) + textbox.position.x, textbox.position.y};
+	}
+
+
 	append(&textboxCoreData.textboxes, textbox);
+
 
 	return .none;
 }
@@ -329,9 +343,12 @@ draw_textboxes :: proc() -> ErrorCode {
 		// Options
 		if len(textbox.options) > 1 {
 			if textbox.clickable {
+			//	rect: Rectangle = {
+			//		bodyRect.width * 2/3, bodyRect.y,
+			//		bodyRect.width * 1/3, f32(32 + (len(textbox.options) * 20))};
 				rect: Rectangle = {
-					bodyRect.width * 2/3, bodyRect.y,
-					bodyRect.width * 1/3, f32(32 + (len(textbox.options) * 20))};
+					textbox.optionsPosition.x, textbox.optionsPosition.y,
+					textbox.optionsSize.x,     textbox.optionsSize.y};
 				ray.draw_texture_n_patch(textbox.texture, textbox.nPatch, rect, Vector2{0,0}, 0, ray.WHITE);
 				
 				for o:=0; o < len(textbox.options); o+=1 {

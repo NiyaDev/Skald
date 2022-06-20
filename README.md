@@ -50,6 +50,10 @@ Skald is a Textbox system for game development that is made to be simple to use.
 >`textSingle: string = ""` Used if only a single line needed. If both are empty it will fill this with a placegolder.
 >
 >`options: [dynamic]MenuOption = nil` Used for player choice.
+>
+>`optionsPosition: Vector2 = {}` The position of the option box.
+>
+>`optionsSize: Vector2 = {}` The dimensions of the options box.
 
 >__`update_textboxes() -> ErrorCode`__
 >
