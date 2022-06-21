@@ -19,7 +19,9 @@ import "../raylib"
 //= Procedures
 
 // Update
-// TODO: detach cursor blinking from update tic
+// TODO: Detach cursor blinking from update tic
+// TODO: Only the [0]th textbox gets updated
+// TODO: Simpler Flags for blinking, Text is ready, textbox is on last line, etc.
 update_textboxes :: proc() -> ErrorCode {
 	numOfTextboxes := len(textboxCoreData.textboxes);
 	
@@ -77,7 +79,7 @@ update_textboxes :: proc() -> ErrorCode {
 		strLength: u32 = u32(len(textbox.completeText[textbox.dispLine]) - 1);
 		arrLength: u32 = u32(len(textbox.completeText) - 1);
 
-		if textbox.dispChar <= strLength {
+		if textbox.dispChar <= strLength {           
 			textbox.dispChar = strLength+1;
 			textbox.clickable = true;
 			return .none;
