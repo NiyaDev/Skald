@@ -32,11 +32,8 @@ TextboxCoreData :: struct {
 // TODO: color
 @(private)
 Textbox :: struct {
-	position:           raylib.Vector2,
-	size:               raylib.Vector2,
+	textboxRect:        raylib.Rectangle,
 	offset:             raylib.Vector2,
-
-	type:               TextboxType, // ???
 
 	texture:            raylib.Texture,
 	cursor:             raylib.Texture,
@@ -49,8 +46,7 @@ Textbox :: struct {
 	completeText:       [dynamic]string,
 
 	options:            [dynamic]MenuOption,
-	optionsPosition:    raylib.Vector2,
-	optionsSize:        raylib.Vector2,
+	optionsRect:        raylib.Rectangle,
 
 	clickable:          bool,
 	displayCursor:      bool,

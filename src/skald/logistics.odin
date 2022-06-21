@@ -100,46 +100,59 @@ update_textboxes :: proc() -> ErrorCode {
 }
 
 // Draw
+draw_textboxes_new :: proc() -> ErrorCode {
+	numOfTextboxes := len(textboxCoreData.textboxes);
+
+	for i:=0; i < numOfTextboxes; i+=1 {
+		textbox: Textbox = textboxCoreData.textboxes[i];
+
+		text: cstring = strings.clone_to_cstring(textbox.currentText);
+		textX: i32    = i32(textbox.textboxRect.x + textbox.offset.x);
+		textY: i32    = i32(textbox.textboxRect.y + textbox.offset.y);
+	}
+
+	return .none;
+}
 draw_textboxes :: proc() -> ErrorCode {
 	numOfTextboxes := len(textboxCoreData.textboxes);
 	
 	for i:=0; i < numOfTextboxes; i +=1 {
-		textbox:  Textbox          = textboxCoreData.textboxes[i];
-		bodyRect: raylib.Rectangle = {textbox.position.x, textbox.position.y, textbox.size.x, textbox.size.y};
+		textbox: Textbox = textboxCoreData.textboxes[i];
 
 		text: cstring = strings.clone_to_cstring(textbox.currentText);
-		textX: i32    = i32(bodyRect.x + textbox.offset.x);
-		textY: i32    = i32(bodyRect.y + textbox.offset.y);
+		textX: i32    = i32(textbox.textboxRect.x + textbox.offset.x);
+		textY: i32    = i32(textbox.textboxRect.y + textbox.offset.y);
 
-		raylib.draw_texture_n_patch(textbox.texture, textbox.nPatch, bodyRect, raylib.Vector2{0,0}, 0, raylib.WHITE);
+		raylib.draw_texture_n_patch(
+			textbox.texture, textbox.nPatch,
+			textbox.textboxRect,
+			raylib.Vector2{0,0}, 0,
+			raylib.WHITE);
 		raylib.draw_text(text, textX, textY, textbox.fontSize, raylib.BLACK);
 
 		delete(text);
 
 		// No options
 		if len(textbox.options) == 1 && textbox.displayCursor {
-			cursorX: i32 = i32((textbox.position.x + textbox.size.x) - textbox.offset.x);
-			cursorY: i32 = i32((textbox.position.y + textbox.size.y) - textbox.offset.y);
+			cursorX: i32 = i32((textbox.textboxRect.x + textbox.textboxRect.width)  - textbox.offset.x);
+			cursorY: i32 = i32((textbox.textboxRect.y + textbox.textboxRect.height) - textbox.offset.y);
 
 			raylib.draw_texture(textbox.cursor, cursorX, cursorY, raylib.WHITE);
 		}
 		// Options
 		if len(textbox.options) > 1 {
 			if textbox.clickable {
-				rect: raylib.Rectangle = {
-					textbox.optionsPosition.x, textbox.optionsPosition.y,
-					textbox.optionsSize.x,     textbox.optionsSize.y};
-				raylib.draw_texture_n_patch(textbox.texture, textbox.nPatch, rect, raylib.Vector2{0,0}, 0, raylib.WHITE);
+				raylib.draw_texture_n_patch(textbox.texture, textbox.nPatch, textbox.optionsRect, raylib.Vector2{0,0}, 0, raylib.WHITE);
 				
 				for o:=0; o < len(textbox.options); o+=1 {
 					text: cstring = strings.clone_to_cstring(textbox.options[o].text);
-					raylib.draw_text(text, i32(rect.x + 40), i32(rect.y) + textbox.fontSize + i32(o) * textbox.fontSize, textbox.fontSize, raylib.BLACK);
+					raylib.draw_text(text, i32(textbox.optionsRect.x + 40), i32(textbox.optionsRect.y) + textbox.fontSize + i32(o) * textbox.fontSize, textbox.fontSize, raylib.BLACK);
 					delete(text);
 				}
 
 				if textbox.displayCursor {
-					cursorX: i32 = i32((rect.x + 16));
-					cursorY: i32 = i32(rect.y) + textbox.fontSize + i32(textbox.positionCursor) * textbox.fontSize;
+					cursorX: i32 = i32((textbox.optionsRect.x + 16));
+					cursorY: i32 = i32(textbox.optionsRect.y) + textbox.fontSize + i32(textbox.positionCursor) * textbox.fontSize;
 					
 					raylib.draw_texture(textbox.cursor, cursorX, cursorY, raylib.WHITE);
 				}

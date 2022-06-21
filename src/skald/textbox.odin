@@ -18,8 +18,7 @@ import "../raylib"
 
 // Create textbox
 create_textbox :: proc(
-		position:        raylib.Vector2      = {  0,  0},
-		size:            raylib.Vector2      = {200,100},
+		textboxRect:     raylib.Rectangle    = { 0, 0, 200, 100},
 		offset:          raylib.Vector2      = { 16, 16},
 		
 		texture:         raylib.Texture      = {},
@@ -31,16 +30,16 @@ create_textbox :: proc(
 		textDynamic:     [dynamic]string     = nil,
 		textSingle:      string              = "",
 		options:         [dynamic]MenuOption = nil,
-		optionsPosition: raylib.Vector2      = {},
-		optionsSize:     raylib.Vector2      = {}) -> ErrorCode {
+		optionsRect:     raylib.Rectangle    = {}) -> ErrorCode {
 	res := init_check();
 	if output_error(res) do return res;
 
-	textbox: Textbox = {};
-	textbox.position = position;
-	textbox.size     = size;
-	textbox.offset   = offset;
-	textbox.fontSize = fontSize;
+	textbox: Textbox    = {};
+	textbox.textboxRect = textboxRect;
+//	textbox.position    = position;
+//	textbox.size        = size;
+	textbox.offset      = offset;
+	textbox.fontSize    = fontSize;
 	
 	// Checking for empty texture input
 	if texture == {} do textbox.texture = textboxCoreData.defaultTexture;
@@ -80,12 +79,11 @@ create_textbox :: proc(
 		append(&textbox.options,defaultOption);
 	} else do textbox.options = options;
 
-	if optionsSize == {} {
-		textbox.optionsSize     = raylib.Vector2{200, f32((len(textbox.options) - 1) * int(textbox.fontSize)) + 64};
-	}
-
-	if optionsPosition == {} {
-		textbox.optionsPosition = raylib.Vector2{textbox.size.x - (textbox.size.x / 3) + textbox.position.x, textbox.position.y};
+	if optionsRect == {} {
+		textbox.optionsRect.width  = 200;
+		textbox.optionsRect.height = f32((len(textbox.options) - 1) * int(textbox.fontSize)) + 64;
+		textbox.optionsRect.x = textbox.textboxRect.width - (textbox.textboxRect.width / 3) + textbox.textboxRect.x;
+		textbox.optionsRect.y = textbox.textboxRect.y;
 	}
 
 

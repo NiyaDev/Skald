@@ -32,7 +32,11 @@ main :: proc() {
 	append(&text, "Fuck me?");
 	menuOptions: [dynamic]skald.MenuOption;
 	append(&menuOptions, skald.MenuOption{text="Fight",effect=test_proc1},skald.MenuOption{text="Items",effect=test_proc2}, skald.MenuOption{text="Run",effect=skald.default_option});
-	res = skald.create_textbox(position=raylib.Vector2{100,100},texture=tex,size=raylib.Vector2{600,200},textDynamic=text,options=menuOptions);
+	res = skald.create_textbox(
+		textboxRect=raylib.Rectangle{100,100,600,200},
+		texture=tex,
+		textDynamic=text,
+		options=menuOptions);
 	if skald.output_error(res) do return;
 
 
