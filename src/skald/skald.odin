@@ -38,9 +38,10 @@ Textbox :: struct {
 	texture:            raylib.Texture,
 	cursor:             raylib.Texture,
 	nPatch:             raylib.N_Patch_Info,
-	font:               raylib.Font,
 
-	fontSize:           i32,
+	font:               raylib.Font,
+	fontSize:           f32,
+	fontColor:          raylib.Color,
 
 	currentText:        string,
 	completeText:       [dynamic]string,

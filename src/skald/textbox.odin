@@ -24,8 +24,10 @@ create_textbox :: proc(
 		texture:         raylib.Texture      = {},
 		cursor:          raylib.Texture      = {},
 		npatch:          raylib.N_Patch_Info = {},
+
 		font:            raylib.Font         = {},
-		fontSize:        i32                 = 20,
+		fontSize:        f32                 = 20,
+		fontColor:       raylib.Color        = raylib.BLACK,
 		
 		textDynamic:     [dynamic]string     = nil,
 		textSingle:      string              = "",
@@ -36,10 +38,9 @@ create_textbox :: proc(
 
 	textbox: Textbox    = {};
 	textbox.textboxRect = textboxRect;
-//	textbox.position    = position;
-//	textbox.size        = size;
 	textbox.offset      = offset;
 	textbox.fontSize    = fontSize;
+	textbox.fontColor   = fontColor;
 	
 	// Checking for empty texture input
 	if texture == {} do textbox.texture = textboxCoreData.defaultTexture;
