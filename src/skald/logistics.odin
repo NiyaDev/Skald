@@ -89,7 +89,7 @@ update_textboxes :: proc() -> ErrorCode {
 				return .none;
 			} else {
 				textbox.options[textbox.positionCursor].effect();
-				res := close_textbox(len(textboxCoreData.textboxes) - 1);
+				res := close_textbox(0);
 				if output_error(res) do return res;
 				return .none;
 			}
@@ -132,7 +132,8 @@ draw_textboxes :: proc() -> ErrorCode {
 			raylib.draw_texture(textbox.cursor, cursorX, cursorY, raylib.WHITE);
 		}
 		// Options
-		if len(textbox.options) > 1 {
+	//	if len(textbox.options) > 1 {
+		if textbox.options[0].text != "" {
 			if textbox.clickable && int(textbox.dispLine) == len(textbox.completeText) - 1 {
 				raylib.draw_texture_n_patch(
 					textbox.texture, textbox.nPatch,

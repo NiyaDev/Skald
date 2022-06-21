@@ -9,8 +9,25 @@ import "raylib"
 import "skald"
 
 
+tex: raylib.Texture;
+
 test_proc1 :: proc() { fmt.printf("fuck1\n"); }
 test_proc2 :: proc() { fmt.printf("fuck2\n"); }
+
+new_test :: proc() {
+	fmt.printf("fuck1\n");
+
+	text: [dynamic]string;
+	append(&text, "Fuck me?","No fuck me!");
+	menuOptions: [dynamic]skald.MenuOption;
+	append(&menuOptions, skald.MenuOption{text="",effect=new_test});
+	res := skald.create_textbox(
+		textboxRect=raylib.Rectangle{200,100,600,200},
+		texture=tex,
+		textDynamic=text, fontColor=raylib.RED,
+		options=menuOptions);
+	skald.output_error(res);
+}
 
 //= Main
 main :: proc() {
@@ -24,14 +41,14 @@ main :: proc() {
 	if skald.output_error(res) do return;
 
 	img: raylib.Image   = raylib.load_image("data/skald/textbox.png");
-	tex: raylib.Texture = raylib.load_texture_from_image(img);
+	tex = raylib.load_texture_from_image(img);
 	raylib.unload_image(img);
 
 
 	text: [dynamic]string;
 	append(&text, "Fuck me?","No fuck me!");
 	menuOptions: [dynamic]skald.MenuOption;
-	append(&menuOptions, skald.MenuOption{text="Fight",effect=test_proc1},skald.MenuOption{text="Items",effect=test_proc2}, skald.MenuOption{text="Run",effect=skald.default_option});
+	append(&menuOptions, skald.MenuOption{text="Fight",effect=new_test}, skald.MenuOption{text="Items",effect=test_proc2}, skald.MenuOption{text="Run",effect=skald.default_option});
 	res = skald.create_textbox(
 		textboxRect=raylib.Rectangle{100,100,600,200},
 		texture=tex,
