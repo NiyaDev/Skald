@@ -37,19 +37,21 @@ main :: proc() {
 		raylib.set_target_fps(60);
 	}
 
-	res := skald.init_skald();
+	res := skald.init_skald(speed=1);
 	if skald.output_error(res) do return;
 
 	img: raylib.Image   = raylib.load_image("data/skald/textbox.png");
 	tex = raylib.load_texture_from_image(img);
 	raylib.unload_image(img);
 
+	font := raylib.load_font("data/skald/kong.ttf");
 
 	text: [dynamic]string;
 	append(&text, "Fuck me?","No fuck me!");
 	menuOptions: [dynamic]skald.MenuOption;
 	append(&menuOptions, skald.MenuOption{text="Fight",effect=new_test}, skald.MenuOption{text="Items",effect=test_proc2}, skald.MenuOption{text="Run",effect=skald.default_option});
 	res = skald.create_textbox(
+		font=font, fontSize=16,
 		textboxRect=raylib.Rectangle{100,100,600,200},
 		texture=tex,
 		textDynamic=text, fontColor=raylib.RED,

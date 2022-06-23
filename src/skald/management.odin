@@ -26,7 +26,7 @@ init_skald :: proc(
 
 	textboxCoreData = new(TextboxCoreData);
 	textboxCoreData.textspeed = speed;
-	textboxCoreData.updateTic = 0;
+	textboxCoreData.updateTick = 0;
 
 	// Checking for empty texture input
 	if texture == {} {

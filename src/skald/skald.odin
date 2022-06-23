@@ -21,7 +21,10 @@ textboxCoreData: ^TextboxCoreData;
 @(private)
 TextboxCoreData :: struct {
 	textspeed: u8,
-	updateTic: u8,
+
+	updateTick:       u8,
+	cursorUpdateTick: u8,
+	skipBuffer:       u8,
 
 	defaultTexture:  raylib.Texture,
 	defaultCursor:   raylib.Texture,
