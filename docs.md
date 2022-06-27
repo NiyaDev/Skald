@@ -10,9 +10,9 @@
 >
 > `speed: u8 = 2` Text speed.
 >
-> `texture, cursor: Raylib.Texture = {}` Default textures. If empty it will create small placeholders.
+> `texture, cursor: raylib.Texture = {}` Default textures. If empty it will create small placeholders.
 >
-> `font: Raylib.Font = {}` Default font. If empty, it will grab Raylib's current font.
+> `font: raylib.Font = {}` Default font. If empty, it will grab Raylib's current font.
 
 >__`free_skald() -> ErrorCode`__
 >
@@ -24,15 +24,19 @@
 >
 >__Input:__
 >
->`position, size, offset: Raylib.Vector2` Transform of the textbox.
+>`textboxRect: raylib.Rectangle` Transform of the textbox
 >
->`texture, cursor: Raylib.Texture = {}` Sets textures. If empty, will use default.
+>`offset: raylib.Vector2` The text offset from the edges of the box.
 >
->`npatch: Raylib.N_Patch_Info = {}` The NPatch settings for the texture.
+>`texture, cursor: raylib.Texture = {}` Sets textures. If empty, will use default.
 >
->`font: Raylib.Font = {}` Sets font. If empty, will use default.
+>`npatch: raylib.N_Patch_Info = {}` The NPatch settings for the texture.
 >
->`fontsize: i32 = 20` Font size.
+>`font: raylib.Font = {}` Sets font. If empty, will use default.
+>
+>`fontSize: i32 = 20` Font size.
+>
+>`fontColor: raylib.Color = raylib.BLACK` Font color.
 >
 >`textDynamic: [dynamic]string = nil` A dynamic list of strings. Each string will be displayed individually per box, and box will keep going until the end.
 >
@@ -40,9 +44,7 @@
 >
 >`options: [dynamic]MenuOption = nil` Used for player choice.
 >
->`optionsPosition: Vector2 = {}` The position of the option box.
->
->`optionsSize: Vector2 = {}` The dimensions of the options box.
+>`optionsRect: raylib.Rectangle` Transform of the options box.
 
 >__`update_textboxes() -> ErrorCode`__
 >
