@@ -1,5 +1,5 @@
 ### Data structures:
-> `MenuOption :: struct { text:   string, effect: proc(), };`
+> `MenuOption :: struct { text: string, effect: proc(), };`
 
 ### General Procedures:
 >__`init_skald() -> ErrorCode`__
