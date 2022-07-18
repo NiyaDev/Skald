@@ -3,6 +3,8 @@ package skald2
 
 
 //= Imports
+import "../raylib"
+
 
 //= Constants
 
@@ -24,7 +26,7 @@ Textbox :: struct {
 
 	updateTick: u8,
 	cursorTick: u8,
-	textSpeed:  u8,
+	fontSpeed:  u8,
 
 	finishedPrinting: bool,
 	displayCursor:    bool,
@@ -70,7 +72,7 @@ create_textbox_gfx :: proc(
 		fontColor:   raylib.Color=raylib.BLACK,
 		textDynamic: [dynamic]string=nil,
 		textSingle:  string="",
-		options:     OptionBox=nil) {
+		options:     OptionBox={}) {
 	textbox: Textbox = {};
 
 	// Textures
@@ -91,4 +93,18 @@ create_textbox_gfx :: proc(
 	textbox.fontColor = fontColor;
 
 	// Text
+	if textDynamic == nil && textSingle == "" do append(&textbox.completeText, "PLACEHOLDER");
+	if textSingle  != ""  do append(&textbox.completeText, textSingle);
+	if textDynamic != nil do textbox.completeText = textDynamic;
+
+	// Options
+	if options.options == nil {
+		textbox.options.textures  = textbox.textures;
+		textbox.options.transform = textbox.transform;
+		append(&textbox.options.options, MenuOption{"",default_proc});
+	}
+
+	append(&textboxCore.textboxes, textbox);
 }
+
+default_proc :: proc() {}
