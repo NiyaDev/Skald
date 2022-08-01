@@ -7,7 +7,7 @@ import "core:strings"
 
 import "raylib"
 import "skald"
-import "skald2"
+//import "skald2"
 
 
 tex: raylib.Texture;
@@ -21,12 +21,19 @@ new_test :: proc() {
 	text: [dynamic]string;
 	append(&text, "Fuck me?","No fuck me!");
 	menuOptions: [dynamic]skald.MenuOption;
-	append(&menuOptions, skald.MenuOption{text="",effect=new_test});
+	append(&menuOptions, skald.MenuOption{text="X",effect=new_test});
 	res := skald.create_textbox(
-		textboxRect=raylib.Rectangle{200,100,600,200},
+		textboxRect={  0, 460, 1280, 260},
+		optionsRect={100, 460,  200, 100},
 		texture=tex,
 		textDynamic=text, fontColor=raylib.RED,
 		options=menuOptions);
+	//	textboxRect={  0, 460, 1280, 260},
+	//	optionsRect={100, 460,  200, 100},
+	//	fontSize=16,
+	//	offset={32,32},
+	//	textSingle="Choose target",
+	//	options=options);
 	skald.output_error(res);
 }
 

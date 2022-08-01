@@ -85,7 +85,7 @@ create_textbox :: proc(
 		textbox.optionsRect.height = f32((len(textbox.options) - 1) * int(textbox.fontSize)) + 64;
 		textbox.optionsRect.x = textbox.textboxRect.width - (textbox.textboxRect.width / 3) + textbox.textboxRect.x;
 		textbox.optionsRect.y = textbox.textboxRect.y;
-	}
+	} else do textbox.optionsRect = optionsRect;
 
 
 	append(&textboxCoreData.textboxes, textbox);

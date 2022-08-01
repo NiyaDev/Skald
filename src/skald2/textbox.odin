@@ -23,7 +23,6 @@ Textbox :: struct {
 
 	options: OptionBox,
 
-
 	updateTick: u8,
 	cursorTick: u8,
 	fontSpeed:  u8,
@@ -108,3 +107,17 @@ create_textbox_gfx :: proc(
 }
 
 default_proc :: proc() {}
+
+
+update_textboxes :: proc() {}
+draw_textboxes :: proc() {
+	length := len(textboxCore.textboxes);
+
+	// Iterate for every textbox
+	for i:=0; i<length; i+=1 {
+		textbox: Textbox = textboxCore.textboxes[i];
+
+		// Copy current string
+		text: cstring = strings.clone_to_cstring(textbox.currentText);
+	}
+}
